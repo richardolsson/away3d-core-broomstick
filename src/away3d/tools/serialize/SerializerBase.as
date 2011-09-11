@@ -1,11 +1,9 @@
 package away3d.tools.serialize
 {
 	import away3d.core.math.Quaternion;
-	import away3d.entities.Mesh;
 	import away3d.errors.AbstractMethodError;
-	
+
 	import flash.geom.Vector3D;
-	import flash.utils.getQualifiedClassName;
 
 	/**
 	 * SerializerBase is the abstract class for all Serializers. It provides an interface for basic data type writing.
@@ -32,6 +30,16 @@ package away3d.tools.serialize
 			throw new AbstractMethodError();
 		}
 		
+    /**
+     * Serialize int
+     * @param name name of value being serialized
+     * @param value value being serialized
+     */
+    public function writeInt(name:String, value:int):void
+    {
+      throw new AbstractMethodError();
+    }
+    
 		/**
 		 * Serialize uint
 		 * @param name name of value being serialized

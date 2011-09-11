@@ -3,19 +3,12 @@ package away3d.core.render
 	import away3d.arcane;
 	import away3d.cameras.Camera3D;
 	import away3d.core.base.IRenderable;
-	import away3d.core.sort.DepthSorter;
+	import away3d.core.data.RenderableListItem;
 	import away3d.core.traverse.EntityCollector;
 	import away3d.materials.MaterialBase;
-	import away3d.materials.utils.AGAL;
 
-	import com.adobe.utils.AGALMiniAssembler;
-
-	import flash.display3D.Context3D;
 	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DCompareMode;
-	import flash.display3D.Context3DProgramType;
-	import flash.display3D.Context3DVertexBufferFormat;
-	import flash.display3D.Program3D;
 
 	use namespace arcane;
 
@@ -55,6 +48,7 @@ package away3d.core.render
 		{
 		}
 
+
 		/**
 		 * @inheritDoc
 		 */
@@ -68,12 +62,12 @@ package away3d.core.render
 				drawSkyBox(entityCollector);
 
 			_context.setDepthTest(true, Context3DCompareMode.LESS);
-			drawRenderables(entityCollector.opaqueRenderables, entityCollector);
+			drawRenderables(entityCollector.opaqueRenderableHead, entityCollector);
 
 			if (_renderBlended)
-				drawRenderables(entityCollector.blendedRenderables, entityCollector);
+				drawRenderables(entityCollector.blendedRenderableHead, entityCollector);
 
-			if (_activeMaterial) _activeMaterial.deactivate(_context);
+			if (_activeMaterial) _activeMaterial.deactivate(_stage3DProxy);
 			_activeMaterial = null;
 		}
 
@@ -83,9 +77,9 @@ package away3d.core.render
 			var material : MaterialBase = skyBox.material;
 			var camera : Camera3D = entityCollector.camera;
 
-			material.activateForDepth(_context, _contextIndex, camera);
-			material.renderDepth(skyBox, _context, _contextIndex, camera);
-			material.deactivateForDepth(_context);
+			material.activateForDepth(_stage3DProxy, camera);
+			material.renderDepth(skyBox, _stage3DProxy, camera);
+			material.deactivateForDepth(_stage3DProxy);
 		}
 
 		/**
@@ -93,25 +87,22 @@ package away3d.core.render
 		 * @param renderables The renderables to draw.
 		 * @param entityCollector The EntityCollector containing all potentially visible information.
 		 */
-		private function drawRenderables(renderables : Vector.<IRenderable>, entityCollector : EntityCollector) : void
+		private function drawRenderables(item : RenderableListItem, entityCollector : EntityCollector) : void
 		{
-			var renderable : IRenderable;
-			var i : uint, j : uint, k : uint;
-			var numRenderables : uint = renderables.length;
 			var camera : Camera3D = entityCollector.camera;
+			var item2 : RenderableListItem;
 
-			while (i < numRenderables) {
-				_activeMaterial = renderables[i].material;
+			while (item) {
+				_activeMaterial = item.renderable.material;
 
-				k = i;
-				_activeMaterial.activateForDepth(_context, _contextIndex, camera);
+				_activeMaterial.activateForDepth(_stage3DProxy, camera);
+				item2 = item;
 				do {
-					renderable = renderables[k];
-					_activeMaterial.renderDepth(renderable, _context, _contextIndex, camera);
-				} while(++k < numRenderables && renderable.material != _activeMaterial);
-				_activeMaterial.deactivateForDepth(_context);
-
-				i = k;
+					_activeMaterial.renderDepth(item2.renderable, _stage3DProxy, camera);
+					item2 = item2.next;
+				} while(item2 && item2.renderable.material == _activeMaterial);
+				_activeMaterial.deactivateForDepth(_stage3DProxy);
+				item = item2;
 			}
 		}
 	}

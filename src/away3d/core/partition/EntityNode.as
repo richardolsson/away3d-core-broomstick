@@ -3,8 +3,6 @@ package away3d.core.partition
 	import away3d.arcane;
 	import away3d.cameras.Camera3D;
 	import away3d.core.traverse.PartitionTraverser;
-	import away3d.entities.Sprite3D;
-	import away3d.errors.AbstractMethodError;
 	import away3d.entities.Entity;
 
 	use namespace arcane;
@@ -67,6 +65,7 @@ package away3d.core.partition
 		 */
 		override public function isInFrustum(camera : Camera3D) : Boolean
 		{
+			if (_entity.isVisible == false) return false;
 			_entity.pushModelViewProjection(camera);
 			return _entity.bounds.isInFrustum(_entity.modelViewProjection);
 		}

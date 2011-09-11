@@ -3,9 +3,10 @@ package away3d.core.render
 	import away3d.arcane;
 	import away3d.core.managers.Stage3DProxy;
 	import away3d.core.sort.EntitySorterBase;
-	import away3d.core.sort.RenderableSorter;
+	import away3d.core.sort.RenderableMergeSort;
 	import away3d.core.traverse.EntityCollector;
 	import away3d.errors.AbstractMethodError;
+	import away3d.events.Stage3DEvent;
 
 	import flash.display3D.Context3D;
 	import flash.display3D.textures.TextureBase;
@@ -22,12 +23,12 @@ package away3d.core.render
 	{
 		protected var _context : Context3D;
 		protected var _stage3DProxy : Stage3DProxy;
-		protected var _contextIndex : int = -1;
+//		protected var _contextIndex : int = -1;
 
 		private var _backBufferWidth : int;
 		private var _backBufferHeight : int;
 		protected var _backBufferInvalid : Boolean;
-		private var _antiAlias : uint;
+		protected var _antiAlias : uint;
 		private var _renderMode : String;
 
 		protected var _backgroundR : Number = 0;
@@ -40,10 +41,10 @@ package away3d.core.render
 		protected var _viewPortY : Number = 0;
 
 		private var _viewPortInvalid : Boolean;
-		private var _enableDepthAndStencil : Boolean;
-		private var _swapBackBuffer : Boolean = true;
+		protected var _enableDepthAndStencil : Boolean;
+		protected var _swapBackBuffer : Boolean = true;
 
-		protected var _renderableSorter : EntitySorterBase;
+		private var _renderableSorter : EntitySorterBase;
 
 		/**
 		 * Creates a new RendererBase object.
@@ -56,7 +57,17 @@ package away3d.core.render
 			_antiAlias = antiAlias;
 			_renderMode = renderMode;
 			_enableDepthAndStencil = enableDepthAndStencil;
-			_renderableSorter = new RenderableSorter();
+			_renderableSorter = new RenderableMergeSort();
+		}
+
+		public function get renderableSorter() : EntitySorterBase
+		{
+			return _renderableSorter;
+		}
+
+		public function set renderableSorter(value : EntitySorterBase) : void
+		{
+			_renderableSorter = value;
 		}
 
 		public function get context() : Context3D
@@ -64,10 +75,10 @@ package away3d.core.render
 			return _context;
 		}
 
-		public function get contextIndex() : int
-		{
-			return _contextIndex;
-		}
+//		public function get contextIndex() : int
+//		{
+//			return _contextIndex;
+//		}
 
 		/**
 		 * Indicates whether or not the back buffer should be swapped when rendering is complete.
@@ -157,10 +168,10 @@ package away3d.core.render
 				return;
 			
 			if (!value) {
-				if (_stage3DProxy) _stage3DProxy.removeEventListener(Event.CONTEXT3D_CREATE, onContextUpdate);
+				if (_stage3DProxy) _stage3DProxy.removeEventListener(Stage3DEvent.CONTEXT3D_CREATED, onContextUpdate);
 				_stage3DProxy = null;
 				_context = null;
-				_contextIndex = -1;
+//				_contextIndex = -1;
 				return;
 			}
 			else if (_stage3DProxy) throw new Error("A Stage3D instance was already assigned!");
@@ -170,10 +181,10 @@ package away3d.core.render
 
 			if (value.context3D) {
 				_context = value.context3D;
-				_contextIndex = value.stage3DIndex;
+//				_contextIndex = value.stage3DIndex;
 			}
 			else
-				value.addEventListener(Event.CONTEXT3D_CREATE, onContextUpdate);
+				value.addEventListener(Stage3DEvent.CONTEXT3D_CREATED, onContextUpdate);
 		}
 
 		/**
@@ -297,6 +308,12 @@ package away3d.core.render
 			if (!_context) return;
 
 			executeRender(entityCollector, target, surfaceSelector, additionalClearMask);
+
+			// clear buffers
+			for (var i : uint = 0; i < 8; ++i) {
+				_stage3DProxy.setSimpleVertexBuffer(i, null);
+				_stage3DProxy.setTextureAt(i, null);
+			}
 		}
 
 		/**
@@ -353,7 +370,7 @@ package away3d.core.render
 		private function onContextUpdate(event : Event) : void
 		{
 			_context = _stage3DProxy.context3D;
-			_contextIndex = _stage3DProxy.stage3DIndex;
+//			_contextIndex = _stage3DProxy.stage3DIndex;
 		}
 
 	}

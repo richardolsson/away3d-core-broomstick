@@ -1,9 +1,7 @@
 package away3d.bounds
 {
 	import away3d.core.base.Geometry;
-
 	import away3d.primitives.WireframePrimitiveBase;
-
 	import away3d.primitives.WireframeSphere;
 
 	import flash.geom.Matrix3D;
@@ -34,6 +32,11 @@ package away3d.bounds
 		 * @inheritDoc
 		 */
 		override public function isInFrustum(mvpMatrix : Matrix3D) : Boolean
+		{
+			return _alwaysIn;
+		}
+
+		override public function intersectsLine(p : Vector3D, dir : Vector3D) : Boolean
 		{
 			return _alwaysIn;
 		}

@@ -2,7 +2,7 @@ package away3d.library.assets
 {
 	import away3d.arcane;
 	import away3d.events.AssetEvent;
-	
+
 	import flash.events.EventDispatcher;
 
 	use namespace arcane;
@@ -43,11 +43,14 @@ package away3d.library.assets
 		}
 		public function set name(val : String) : void
 		{
+			var prev : String;
+			
+			prev = _name;
 			_name = val;
 			update();
 			
 			if (hasEventListener(AssetEvent.ASSET_RENAME))
-				dispatchEvent(new AssetEvent(AssetEvent.ASSET_RENAME));
+				dispatchEvent(new AssetEvent(AssetEvent.ASSET_RENAME, IAsset(this), prev));
 		}
 		
 		
@@ -77,6 +80,12 @@ package away3d.library.assets
 				_originalName = _name;
 		
 			update();
+		}
+		
+		
+		public function disposeAsset() : void
+		{
+			// TODO: Should be overridden by sub-types
 		}
 		
 		

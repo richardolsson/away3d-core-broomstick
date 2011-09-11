@@ -1,17 +1,18 @@
 ﻿package away3d.primitives
 {
 	import away3d.entities.*;
+
 	import flash.geom.Vector3D;
-	
+
 	/**
-	* Class WireFrameGrid generates a grid of lines on a given plane<code>WireFrameGrid</code>
+	* Class WireframeGrid generates a grid of lines on a given plane<code>WireframeGrid</code>
 	* @param	subDivision		[optional] uint . Default is 10;
 	* @param	gridSize				[optional] uint . Default is 100;
 	* @param	color					[optional] uint . Default is 0xFFFFFF;
 	* @param	thickness			[optional] Number . Default is 1;
 	* @param	plane					[optional] String . Default is PLANE_XZ;
 	* @param	worldPlanes		[optional] Boolean . Default is false.
-	* If true, class displays the 3 world planes, at 0,0,0. with subDivision, thickness and and gridSize. Overrides color and plane settings.
+	* If true, class displays the 3 world planes, at 0,0,0. with subDivision, thickness and gridSize. Overrides color and plane settings.
 	*/
 		
 	public class WireframeGrid extends SegmentSet

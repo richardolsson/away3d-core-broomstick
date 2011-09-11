@@ -2,9 +2,9 @@ package away3d.tools.serialize
 {
 	import away3d.arcane;
 	import away3d.core.math.Quaternion;
-	
+
 	import flash.geom.Vector3D;
-	
+
 	use namespace arcane;
 
 	/**
@@ -35,6 +35,18 @@ package away3d.tools.serialize
 			_indent += tabSize;
 		}
 		
+    /**
+		 * @inheritDoc
+     */
+    public override function writeInt(name:String, value:int):void
+    {
+      var outputString:String = _indentString();
+      outputString += name;
+      outputString += separator;
+      outputString += value;
+      trace(outputString);
+    }
+    
 		/**
 		 * @inheritDoc
 		 */

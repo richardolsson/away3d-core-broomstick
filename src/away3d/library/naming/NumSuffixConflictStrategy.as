@@ -1,23 +1,25 @@
-package away3d.library.strategies
+package away3d.library.naming
 {
 	import away3d.arcane;
 	import away3d.library.assets.IAsset;
 
 	use namespace arcane;
 	
-	public class NumSuffixNamingStrategy extends NamingStrategyBase
+	public class NumSuffixConflictStrategy extends ConflictStrategyBase
 	{
 		private var _separator : String;
+		private var _next_suffix : Object;
 		
-		public function NumSuffixNamingStrategy(separator : String = '.')
+		public function NumSuffixConflictStrategy(separator : String = '.')
 		{
 			super();
 			
 			_separator = separator;
+			_next_suffix = {};
 		}
 		
 		
-		public override function resolveConflict(changedAsset:IAsset, oldAsset:IAsset, assetsDictionary:Object, preference:String) : void
+		public override function resolveConflict(changedAsset:IAsset, oldAsset:IAsset, assetsDictionary:Object, precedence:String) : void
 		{
 			var orig : String;
 			var new_name : String;
@@ -40,6 +42,9 @@ package away3d.library.strategies
 				suffix = 0;
 			}
 			
+			if (suffix == 0 && _next_suffix.hasOwnProperty(base))
+				suffix = _next_suffix[base];
+			
 			// Find the first suffixed name that does
 			// not collide with other names.
 			do {
@@ -47,7 +52,15 @@ package away3d.library.strategies
 				new_name = base.concat(_separator, suffix);
 			} while (assetsDictionary.hasOwnProperty(new_name));
 			
-			updateNames(oldAsset.assetNamespace, new_name, oldAsset, changedAsset, assetsDictionary, preference);
+			_next_suffix[base] = suffix;
+			
+			updateNames(oldAsset.assetNamespace, new_name, oldAsset, changedAsset, assetsDictionary, precedence);
+		}
+		
+		
+		public override function create() : ConflictStrategyBase
+		{
+			return new NumSuffixConflictStrategy(_separator);
 		}
 	}
 }
